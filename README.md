@@ -5,9 +5,14 @@ Install the php dependencies
 composer install
 ```
 
-Run the tests
+Create the env file
 ```
-php artisan test
+cp .env.example .env
+```
+
+Generate application key
+```
+php artisan key:generate
 ```
 
 Install javascript dependencies
@@ -19,4 +24,9 @@ Install javascript dependencies
 ```
 npm run build
 ```
+*built assets are at <code>public/build</code> folder*
 
+Run the tests
+```
+php artisan test
+```
