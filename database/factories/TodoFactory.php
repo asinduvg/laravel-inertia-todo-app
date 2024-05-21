@@ -21,4 +21,32 @@ class TodoFactory extends Factory
             'done' => $this->faker->randomElement([true, false]),
         ];
     }
+
+    public function expired(): static
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'created_at' => now()->subDays(40),
+                'updated_at' => now()->subDays(40),
+            ];
+        });
+    }
+
+    public function done(): static
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'done' => true,
+            ];
+        });
+    }
+
+    public function notDone(): static
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'done' => false,
+            ];
+        });
+    }
 }

@@ -26,6 +26,9 @@ class DeleteExpiredTodos implements ShouldQueue
      */
     public function handle(): void
     {
-        Todo::query()->withoutGlobalScopes()->where('created_at', '>', now()->subDays(30))->delete();
+        Todo::query()
+            ->where('created_at', '<', now()->subDays(30))
+            ->where('done', '=', 1)
+            ->delete();
     }
 }
