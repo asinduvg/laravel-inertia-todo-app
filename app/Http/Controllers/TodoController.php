@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Contracts\TodoServiceContract;
 use App\Http\Requests\StoreTodoRequest;
 use App\Http\Requests\UpdateTodoRequest;
 use App\Http\Resources\TodoResource;
@@ -9,6 +10,8 @@ use App\Models\Todo;
 
 class TodoController extends Controller
 {
+    public function __construct(public TodoServiceContract $service) {}
+
     /**
      * Display a listing of the resource.
      */
@@ -19,7 +22,7 @@ class TodoController extends Controller
         return inertia('Todo/Index', [
             'todos' => fn() => cache()
                 ->get('todo-' . auth()->user()->id,
-                    fn() => TodoResource::collection(Todo::query()->get()))
+                    fn() => TodoResource::collection($this->service->get()))
         ]);
     }
 
@@ -30,7 +33,7 @@ class TodoController extends Controller
     {
         abort_if(auth()->user()->cannot('create', Todo::class), 403);
 
-        Todo::query()->create(array_merge($request->validated(), ['user_id' => auth()->user()->id]));
+        $this->service->create($request->validated());
 
         cache()->forget('todo-' . auth()->user()->id);
 
@@ -44,7 +47,7 @@ class TodoController extends Controller
     {
         abort_if(auth()->user()->cannot('update', $todo), 403);
 
-        $todo->update($request->validated());
+        $this->service->update($todo, $request->validated());
 
         cache()->forget('todo-' . auth()->user()->id);
 
@@ -58,7 +61,7 @@ class TodoController extends Controller
     {
         abort_if(auth()->user()->cannot('delete', $todo), 403);
 
-        $todo->delete();
+        $this->service->delete($todo);
 
         cache()->forget('todo-' . auth()->user()->id);
 
