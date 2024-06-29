@@ -1,0 +1,30 @@
+# networks:
+#   hbt-network:
+#     driver: bridge
+
+services:
+  mysql-db:
+    image: mysql:latest
+    container_name: hummingbird-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: pwd2
+      MYSQL_DATABASE: laravel_todo_app
+    ports:
+      - "3306:3306"
+    restart: always
+    healthcheck:
+      test: ['CMD-SHELL', 'mysqladmin ping -h 127.0.0.1 --password="pwd2" --silent']
+      interval: 3s
+      retries: 5
+      start_period: 30s
+  laravel-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    # restart: always
+    container_name: hummingbird-laravel-app
+    depends_on:
+      mysql-db:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
